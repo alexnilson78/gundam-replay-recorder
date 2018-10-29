@@ -1,5 +1,3 @@
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Script Start ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 #include <Misc.au3>
 #include <WinAPISys.au3>
 
@@ -9,6 +7,9 @@ Global $pix1
 Global $doneColor = 0x400000
 Global $recordingHotKey = "{BACKSPACE}"
 Global $stopRecordingHotKey = "{BACKSPACE}"
+Global $ps4MacroPath = "PS4Macro_0_5_2/PS4Macro.exe"
+Global $ps4MacroWindowName = "PS4 Macro - v0.5.2 (BETA)"
+Global $captureWindowName = "Game Capture HD"
 
 Global $macroWindow = LaunchPs4Macro();
 Global $recorder = FindRecorder()
@@ -18,13 +19,13 @@ StartRecording()
 
 While 1
    If isMatchOver() = 1 Then
-	  ;Beep(200, 100)
+	  ;Beep(200, 100) ; for debugging issues with failing to detect match end
 	  SendDownX($macroWindow)
 	  StopRecording()
 	  ExitLoop
    EndIf
 
-   If _IsPressed("24") Then ExitLoop ; Home
+   If _IsPressed("24") Then ExitLoop ; Home button on keyboard will escape this loop just in case
 WEnd
 
 Sleep(7000)
@@ -34,13 +35,13 @@ If isLastReplay($recorder) = 1 Then
 EndIf
 
 Func LaunchPs4Macro()
-   Run("PS4Macro_0_5_2/PS4Macro.exe")
+   Run($ps4MacroPath)
 
-   Return WinWait("PS4 Macro - v0.5.2 (BETA)", "", 10)
+   Return WinWait($ps4MacroWindowName, "", 10)
 EndFunc
 
 Func FindRecorder()
-   Return WinWait("Game Capture HD", "", 10)
+   Return WinWait($captureWindowName, "", 10)
 EndFunc
 
 Func SendUpX($window)
@@ -100,5 +101,3 @@ Func isLastReplay($recorderWindow)
 	  Return 0
    EndIf
 EndFunc
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Script End ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
