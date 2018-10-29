@@ -1,9 +1,6 @@
 #include <Misc.au3>
 #include <WinAPISys.au3>
 
-Global $on = 0
-Global $pix1
-
 Global $doneColor = 0x400000
 Global $recordingHotKey = "{BACKSPACE}"
 Global $stopRecordingHotKey = "{BACKSPACE}"
@@ -14,25 +11,27 @@ Global $captureWindowName = "Game Capture HD"
 Global $macroWindow = LaunchPs4Macro();
 Global $recorder = FindRecorder()
 
-SendUpX($macroWindow)
-StartRecording()
-
-While 1
-   If isMatchOver() = 1 Then
-	  ;Beep(200, 100) ; for debugging issues with failing to detect match end
-	  SendDownX($macroWindow)
-	  StopRecording()
-	  ExitLoop
-   EndIf
-
-   If _IsPressed("24") Then ExitLoop ; Home button on keyboard will escape this loop just in case
+While Not isLastReplay($recorder)
+   RecordNextMatch()
 WEnd
 
-Sleep(7000)
+Func RecordNextMatch()
+   SendUpX($macroWindow)
+   StartRecording()
 
-If isLastReplay($recorder) = 1 Then
-   Beep(200, 100)
-EndIf
+   While 1 ; wait for match to end by checking for the return to replay list dialog
+	  If isMatchOver() = 1 Then
+		 ;Beep(200, 100) ; for debugging issues with failing to detect match end
+		 SendDownX($macroWindow)
+		 StopRecording()
+		 ExitLoop
+	  EndIf
+
+	  If _IsPressed("24") Then ExitLoop ; Home button on keyboard will escape this loop just in case
+   WEnd
+
+   Sleep(7000) ; wait for replay list to load again
+EndFunc
 
 Func LaunchPs4Macro()
    Run($ps4MacroPath)
